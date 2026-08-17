@@ -1,0 +1,52 @@
+name: Daily Internship Scan
+
+on:
+  schedule:
+    # 13:00 UTC = 9am US Eastern during daylight time, 8am during standard
+    # time. Adjust to taste — this is the ONLY thing that makes it "autonomous":
+    # GitHub runs this on its own servers whether your laptop is on or not.
+    - cron: '0 13 * * *'
+  workflow_dispatch: {}   # adds a "Run workflow" button for manual testing
+
+permissions:
+  contents: write   # needed so the workflow can commit the updated seen-list
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run internship radar
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Full JSON of the service account key, pasted as a repo secret.
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          # Doc id from the doc's URL. Not really a secret, but keeping it
+          # alongside the others avoids hardcoding your personal doc in a
+          # public portfolio repo.
+          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+          # The real profile text. Not committed — tools/profile.py ships a
+          # generic placeholder, and this overrides it. Unset is not fatal:
+          # the run scores against the placeholder instead.
+          PROFILE_TEXT: ${{ secrets.PROFILE_TEXT }}
+        run: python tools/main.py
+
+      - name: Commit updated seen-list
+        run: |
+          git config user.name "internship-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/seen_ids.json
+          git diff --staged --quiet || git commit -m "Daily scan: $(date -u +'%Y-%m-%d')"
+          git push

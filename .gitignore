@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Secrets — never commit
+.env
+credentials.json
+token.json
+service-account.json
+
+# Personal — the real profile text (location, work authorisation, coursework).
+# tools/profile.py ships a generic placeholder and picks this up if present.
+tools/profile_local.py
+
+# Private notes, never project documentation
+notes/
+*.private.md
+
+# Disposable intermediates
+.tmp/*
+!.tmp/.gitkeep
