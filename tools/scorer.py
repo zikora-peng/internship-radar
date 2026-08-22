@@ -16,7 +16,7 @@ from collections import deque
 
 from groq import Groq
 
-MODEL = "llama-3.1-8b-instant"
+MODEL = "llama-3.3-70b-versatile"
 BATCH_SIZE = 15
 MAX_OUTPUT_TOKENS = 2000
 
