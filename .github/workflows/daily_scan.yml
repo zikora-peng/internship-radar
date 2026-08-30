@@ -1,11 +1,7 @@
 name: Daily Internship Scan
 
 on:
-  schedule:
-    # 13:00 UTC = 9am US Eastern during daylight time, 8am during standard
-    # time. Adjust to taste — this is the ONLY thing that makes it "autonomous":
-    # GitHub runs this on its own servers whether your laptop is on or not.
-    - cron: '0 13 * * *'
+
   workflow_dispatch: {}   # adds a "Run workflow" button for manual testing
 
 permissions:
